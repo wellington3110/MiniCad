@@ -35,6 +35,7 @@ Command* App::createCommand(UiOption::Shape option)
       case UiOption::BEZIER: return new BezierCmd();
       case UiOption::ARC:    return new ArcCmd();
       case UiOption::LINE:   return new LineCmd();
-      default:; //criar o idle q eu esqueci;
+      default: return nullptr;
    };
+   return nullptr;
 }

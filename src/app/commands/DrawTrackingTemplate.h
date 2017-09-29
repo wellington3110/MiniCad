@@ -16,12 +16,15 @@ protected:
    DrawTrackingTemplate() {}
 
    UiOption::Shape shape;
+   bool isDrawing;
 
-   virtual bool hasEnoughPoints(QVector<QPoint>& points) = 0;
-   virtual void draw(QVector<QPoint>& shapePoints, Ui& ui, bool save) = 0; 
+   virtual bool lastClick(Data& data) = 0;
+   virtual void draw(Data& data, Ui& ui, bool save) = 0; 
+   virtual bool hasEnoughPoints(QVector<QPointF>& points) = 0;
 
-   bool isDrawing(Data& data);
+   bool verifyIsDrawing(Data& data);
    bool finalizedDrawing(Data& data);
+
 };
 
 #endif //INCLUDED_DRAWTRACKINGTEMPLATE_H 

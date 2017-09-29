@@ -7,8 +7,11 @@
 class LineCmd : public DrawTrackingTemplate
 {
 protected:
-   bool hasEnoughPoints(QVector<QPoint>& points);
-   void draw(QVector<QPoint>& shapePoints, Ui& ui, bool save);
+   void draw(Data& data, Ui& ui, bool save);
+
+   bool lastClick(Data& data);
+   bool hasEnoughPoints(QVector<QPointF>& points);
+
 };
 
 #endif //INCLUDED_LINECMD_H 

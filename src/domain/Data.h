@@ -4,19 +4,32 @@
 
 #include <qvector.h>
 #include <qmouseevent>
+#include <qline.h>
 
 class Data
 {
 public:
-   Data(QVector<QPoint>& _points, QMouseEvent& _event) : points(_points), event(_event) {}    
+   
+   static Data& getInstance();
+   
+   void save(QLine& line);
+   void save(QVector<QPointF>& points);
+   void setEvent(QMouseEvent* event);
 
-   QVector<QPoint>& getPoints() { return points; }
-   QMouseEvent& getMouseEvent() { return event; }
+   QMouseEvent& getMouseEvent() { return *mouseEvent; }
+   QVector<QPointF>& getPoints() { return points; }
+   QVector<QLine>& getLines() {return lines;}
+   QVector<QVector<QPointF>> getShapes() { return shapes;}
+
 private:
    Data(const Data&);
- 
-   QVector<QPoint> points;
-   QMouseEvent event;
+   Data() : mouseEvent(nullptr){} 
+
+   QVector<QLine> lines;
+   QVector<QPointF> points;
+   QVector<QVector<QPointF>> shapes;
+
+   QMouseEvent* mouseEvent;
 };
 
 #endif //INCLUDED_DATA_H

@@ -3,18 +3,23 @@
 #include "Ui.h"
 #include "qmouseevent"
 
-void ArcCmd::draw(QVector<QPoint>& arcPoints, Ui& ui, bool save)
+void ArcCmd::draw(Data& data, Ui& ui, bool save)
 {
-   QVector<QPoint> arc;
-
-   //logica
-
-  ui.draw(arc);
-  if(save)
-     ui.save(UiOption::ARC, arc);
+   QVector<QPointF> arc;
+   if(save) {
+      data.save(arc);
+      ui.draw();
+   } else
+      ui.drawTemp(arc);
 }
 
-bool ArcCmd::hasEnoughPoints(QVector<QPoint>& points) 
+bool ArcCmd::hasEnoughPoints(QVector<QPointF>& points) 
 {
    return points.size() == 3;
 }
+
+bool ArcCmd::lastClick(Data& data)
+{
+   return data.getMouseEvent().button() == Qt::LeftButton && data.getPoints().size() == 2;
+}
+

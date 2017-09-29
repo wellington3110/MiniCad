@@ -15,10 +15,10 @@ class Ui
 public:
    virtual ~Ui() {}   
 
-   virtual void draw(QLine& line) = 0;
-   virtual void draw(QPoint& point) = 0;
-   virtual void draw(QVector<QPoint>& points) = 0;
-   virtual void save(UiOption::Shape shape, QVector<QPoint> points) = 0;
+   virtual void draw() = 0;
+   virtual void enableMouseTracking(bool) = 0;
+   virtual void drawTemp(QLine& lineTemp) = 0;
+   virtual void drawTemp(QVector<QPointF>& pointsTemp) = 0;
 
 };
 

@@ -6,6 +6,9 @@
 #include "Ui.h"
 #include "Receiver.h"
 
+class Data;
+class Line;
+
 class QPainter;
 
 class Gui : public QMainWindow, public Ui
@@ -15,31 +18,33 @@ class Gui : public QMainWindow, public Ui
 public:
    Gui(Receiver* app);
 
-   void draw(QLine& line);
-   void draw(QPoint& point);
-   void draw(QVector<QPoint>& points);
-   void save(UiOption::Shape shape, QVector<QPoint> points);
+   void enableMouseTracking(bool enable) {setMouseTracking(enable);}
+
+   void draw() {update();}
+   void drawTemp(QLine& lineTemp);
+   void drawTemp(QVector<QPointF>& pointsTemp);
 
 private:
+   Data& data;
+   QLine* lineTemp;
+   QVector<QPointF> pointsTemp;
    Receiver* app;
-   QWidget* board;
    UiOption::Shape actualOption;
 
-   QVector<QPoint> actualPoints;
-   QVector<QLine> lines;
-   QVector<QVector<QPoint>> shapes;
-   
-   void generateRequest(QMouseEvent& event);
 
    void configureMenuBar();
-   void configurePen(QPainter&);
-               
+   void generateRequest(QMouseEvent* event);
+   void refreshActualOption(UiOption::Shape option);
+
 protected:
    void mouseMoveEvent(QMouseEvent *);
    void mousePressEvent(QMouseEvent *);
+   void paintEvent(QPaintEvent *);
 
 private slots:
-   void refreshActualOption(UiOption::Shape option);
+   void arc() {refreshActualOption(UiOption::ARC);}
+   void line() {refreshActualOption(UiOption::LINE);}
+   void bezier() {refreshActualOption(UiOption::BEZIER);}
 };
 
 #endif

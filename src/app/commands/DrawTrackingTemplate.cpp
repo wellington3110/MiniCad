@@ -2,28 +2,44 @@
 #include "Data.h"
 #include "qmouseevent"
 
-bool DrawTrackingTemplate::isDrawing(Data& data)
-{
-   return hasEnoughPoints(data.getPoints()) && data.getMouseEvent().button() == Qt::MouseButton::NoButton;   
-}
-
 bool DrawTrackingTemplate::finalizedDrawing(Data& data)
 {
-   return hasEnoughPoints(data.getPoints()) && data.getMouseEvent().button() == Qt::MouseButton::LeftButton;   
+   return hasEnoughPoints(data.getPoints()) && data.getMouseEvent().button() == Qt::LeftButton;   
 }
+
 
 void DrawTrackingTemplate::execute(Data& data, Ui& ui)
 {
-   data.getPoints().push_back(data.getMouseEvent().pos());
-   if ( isDrawing(data) ) {
-      draw(data.getPoints(), ui, false);
+   ui.enableMouseTracking(true);
+   isDrawing= verifyIsDrawing(data);
+   if(isDrawing) {
+      draw(data, ui, false);
       data.getPoints().pop_back();
-
-   } else if ( finalizedDrawing(data) ) {
-      draw(data.getPoints(), ui, true);
+   } else if( finalizedDrawing(data) ) {
+      draw(data, ui, true);
       data.getPoints().clear();
    }
 }
+
+bool firstClick(Data& data)
+{
+   return data.getMouseEvent().button() == Qt::LeftButton && data.getPoints().size() == 0;
+}
+
+bool DrawTrackingTemplate::verifyIsDrawing(Data& data)
+{
+   if( firstClick(data) || lastClick(data)  ) {
+      data.getPoints().push_back(data.getMouseEvent().pos());
+      return false;
+   } if(data.getPoints().size() == 0 && data.getMouseEvent().button() == Qt::NoButton)
+      return false;
+
+   data.getPoints().push_back(data.getMouseEvent().pos());
+   return true;
+}
+
+
+
 
 
 

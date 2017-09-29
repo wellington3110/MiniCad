@@ -3,100 +3,96 @@
 #include "qpainter.h"
 #include "Data.h"
 
-Gui::Gui(Receiver* _app) : app(_app)
+Gui::Gui(Receiver* _app) : app(_app), data(Data::getInstance()), lineTemp(nullptr)
 {
-   board= new QWidget(this);
-   board->setMouseTracking(true);
-   setCentralWidget(board);
    resize(500, 300);
    QPalette p= palette();
    p.setColor(QPalette::Background, Qt::white);
    setPalette(p);
-   
+
    configureMenuBar();
 
+   show();
 }
 
 void Gui::configureMenuBar()
 {
-   QMenu* fileMenu= menuBar()->addMenu("Shapeas");
+   QMenu* fileMenu= menuBar()->addMenu("Formas");
    QAction *bezierAct= new QAction("Bezier",this);
    bezierAct->setStatusTip("Desenhar curva de bezier");
-   connect(bezierAct, SIGNAL (bezierAct->triggered()), this, SLOT( refreshActualOption(UiOption::BEZIER) ) );
+   connect(bezierAct, SIGNAL (triggered()), this, SLOT(bezier()) );
    fileMenu->addAction(bezierAct);
 
    QAction *lineAct= new QAction("Linha",this);
    lineAct->setStatusTip("Desenhar uma linha");
-   connect(lineAct, SIGNAL (lineAct->triggered()), this, SLOT( refreshActualOption(UiOption::LINE) ) );
+   connect(lineAct, SIGNAL (triggered()), this, SLOT( line() ));
    fileMenu->addAction(lineAct);
 
    QAction *arcAct= new QAction("Arco",this);
    arcAct->setStatusTip("Desenhar um arco");
-   connect(arcAct, SIGNAL (arcAct->triggered()), this, SLOT( refreshActualOption(UiOption::ARC) ) );
+   connect(arcAct, SIGNAL (triggered()), this, SLOT( arc() ));
    fileMenu->addAction(arcAct);
- 
-}
-
-void Gui::configurePen(QPainter& p)
-{
-   QPen pen;
-   pen.setColor(Qt::black);
-   pen.setWidth(10);
-   p.setPen(pen);
 }
 
 
 void Gui::refreshActualOption(UiOption::Shape option)
-{
+{             
    actualOption= option;
-   actualPoints.clear();
 }
 
 void Gui::mouseMoveEvent(QMouseEvent* event)
 {
-   generateRequest(*event);
+   generateRequest(event);
 }
 
 void Gui::mousePressEvent(QMouseEvent* event)
 {
-   generateRequest(*event);
+   generateRequest(event);
 }
 
-void Gui::generateRequest(QMouseEvent& event)
+void Gui::generateRequest(QMouseEvent* event)
 {
-   Data data(actualPoints, event);
-   app->receiveRequestToExecuteCmd(data, actualOption);
-}
+   if(event) {
+      data.setEvent(event);
+      app->receiveRequestToExecuteCmd(data, actualOption);
+   }
+} 
 
-void Gui::save(UiOption::Shape shape, QVector<QPoint> points)
+void Gui::paintEvent(QPaintEvent *)
 {
-   if (shape == UiOption::LINE) 
-      lines.push_back( QLine(points[0], points[1]) );
-   else
-      shapes.push_back(points);
+   QPainter p(this);
+   QPen pen;
+   pen.setColor(Qt::black);
+   pen.setWidth(5);
+   p.setPen(pen);
+
+   p.drawLines(data.getLines());
+   p.drawPoints(data.getPoints());
+   p.drawPoints(pointsTemp);
+   if(lineTemp)
+      p.drawLine(*lineTemp);
+
+
+   int size= data.getShapes().size();
+   for(int i= 0; i < size; i++)
+      p.drawPoints(data.getShapes()[i]);
+
 }
 
-void Gui::draw(QLine& line)             //
-{                                       //
-   QPainter p;                          //
-   configurePen(p);                     //
-   p.drawLine(line);                    //
-}                                       //
-                                        //
-void Gui::draw(QPoint& point)           //
-{                                       //
-   QPainter p;                          //
-   configurePen(p);                     //TIRAR OS CÓDIGOS REPETIDOS
-   p.drawPoint(point);                  //E INCLUIR QUE SE DEVE
-}                                       //DESENHAR TODAS AS FORMAS
-                                        //ANTES DE DESENHAR O PARAMETRO ENVIADO
-void Gui::draw(QVector<QPoint>& points) //
-{                                       //
-                                        //
-   QPainter p;                          //
-   configurePen(p);                     //
-   p.drawPoints(points);                //
-}                                       //
-                                        //
-                                        //
-                                        //
+void Gui::drawTemp(QLine& _lineTemp)
+{
+   delete lineTemp;
+   lineTemp= new QLine(_lineTemp);
+   update();
+}
+
+void Gui::drawTemp(QVector<QPointF>& _pointsTemp)
+{
+   pointsTemp= _pointsTemp;
+   update();
+}
+
+
+                                        
+                                        
+                                        
